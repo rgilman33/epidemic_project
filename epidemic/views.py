@@ -22,8 +22,9 @@ def model_description(request):
     context_dict = {'boldmessage': "STILL 4EVER BOLD"}
     return render(request, 'epidemic/model_description.html', context_dict)
     
-def dashboard(request):
+def results(request):
     context_dict = {'boldmessage': "STILL 4EVER BOLD"}
-    return render(request, 'epidemic/dashboard.html', context_dict)
+    return render(request, 'epidemic/results.html', context_dict)
+    
 def about(request):
     return HttpResponse("best epidemic model ever. period.")

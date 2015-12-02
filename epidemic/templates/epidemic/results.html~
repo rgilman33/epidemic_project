@@ -1,0 +1,55 @@
+{% extends 'epidemic/base.html' %}
+
+{% block body_block %}
+
+    <h2 class="blog-post-title">Full Results</h2>
+    
+    <p>This is the Python code used to construct the model. You can follow along by refering to the comments highlighted in green </p>
+
+    <hr>
+    
+
+These are screenshots from the interactive graphs to be included in the final version of the model. In the interaction version, strategies can be toggled on and off, graph area can be zoomed and panned, and information about each given scenario pops up when hovering the mouse over it. 
+
+Due to the size of the model, a test set including only populations above 5 million were included. Select results from the deterministic model (set to the same expected values, though for the entire U.S. rather than the test set) are included to illustrate the spatial-temporal progression of the epidemic. A full discussion of the results will be postponed until the final model, though I’ll touch on the main points briefly below:
+
+
+
+
+When quarantine efficiency fails to reach the 80% threshold, a strategy based solely on quarantine and targeted vaccination does not prevent significant mortalities. 
+
+
+
+
+In the case of local vaccination, we notice a slight decrease in fatalities after the restriction of travel. The final two strategies show identical results, suggesting that travel restrictions do not save extra lives when countrywide vaccination has already been undertaken. These two results vary little from local vac + travel restrictions. Notice the fat tails for local vaccination strategies.
+
+
+Quarantine shows the highest average cost as a result of the extended length of the epidemic. It also shows huge variation as a result of sensitivity to beta and the resulting variation in epidemic length.
+
+Zooming in, we see that local vac plus travel restrictions shows the lowest cost. These results are not particularly useful, however, as the cost assumptions are relatively arbitrary at this point. The economic costs of restricting travel have not been included, for example, though they are indeed substantial. These results do suggest, however, that a prolonged ineffective response can bring about significant economic costs. 
+
+While countrywide herd vaccination andappeared the safest option in terms of overall mortalities, it seems to 
+ensure a relatively high rate of vaccination-related deaths.
+
+As mentioned previously, unless beta is reduced by at least 80%, quarantine alone will not prevent an epidemic.
+
+
+An interactive scatterplot shows the outcomes in three dimensions.
+
+
+Quarantine slows down the epidemic.
+
+
+Local vaccination and travel restrictions have a significant impact on the geographic progression of the epidemic, though details are still unclear.
+ 
+Countrywide vaccination stops the epidemic immediately.
+
+
+    
+    <!-- For code chunks. -->
+    <pre class="brush: python" name="code">
+from django.http import HttpResponse
+from django.shortcuts import render            
+    </pre>
+
+{% endblock %}

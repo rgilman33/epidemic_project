@@ -2,11 +2,432 @@
 
 {% block body_block %}
 
-    <h2 class="blog-post-title">Description</h2>
+ <h2 class="blog-post-title">Description</h2>
     
     <p>LETS START W THIS BADAASS 3d scatterplot. Toggle it around a little bit, it feels good.</p>
    
     <p>Look how many people die with no intervention!!</p>
     <hr>
+
+<p>This model attempts to (1) give a detailed spatial-temporal description of a smallpox outbreak following an aerosol attack in a crowded area of a large U.S. city, and (2) show the effects of various interventions. It seeks to answer the question: How should the U.S. government best deploy resources to limit mortalities after a smallpox outbreak?</p>
+	
+<p>The descriptive model on which the decision model is based combines a metapopulation compartment model describing state transitions within each population, and a transportation network describing movement between populations. 	
+		
+<p>The SEIR compartment model describes the flow of people from susceptible, to exposed but not infectious, to infectious, to removed (either 		recovered or dead). State transitions are governed by smallpox’s 		well-documented disease parameters. The SEIR model creates a set of 		differential equations which are solved in series. 				
+<p>The transportation network is composed of two parts: A map of airport markets dividing the U.S. into approximately 300 metapopulations centered around one or more airports (designed with SEDAC data by assigning each population cell to the nearest airport market), and a 300x300 transportation matrix describing directional passenger 	flow between the populations (designed by parsing a U.S. DoT database). 	
+	
+<p>There are three types of intervention included in the model: 
+
+<ul>
+<li>Quarantine of identified infecteds combined with targeted vaccination of only those in the immediate circle of the infected individual, including health workers. This is an attempt to attain herd immunity within the community surrounding an infected. In this model, and other models of this type, the intervention is crudely represented as a reduction in the transmission coefficient beta. As a result of the sensitivity of epidemic outcomes to beta, previous studies have come to vastly different conclusions regarding the effectiveness of quarantine alone in preventing an epidemic of smallpox. This is a key limitation of the compartmental epidemic model: The most this type of model can do is gauge the sensitivity of outcomes to quarantine efficiency, not predict quarantine efficiency itself.</li>
+
+<li>Vaccination, which can be either local (limited to populations with a given number of identified infecteds) or countrywide (administered to all people in all populations regardless of whether or not any infecteds have been identified in their midst). This intervention is represented in the model by removing individuals from the susceptibles population and placing them in the vaccinated category. </li>
+
+<li>Travel restrictions. This intervention is modelled by reducing mixing between populations by a specified rate. </li>
+</ul>
+
+<p>Six strategies (combinations of interventions) are tested:</p>
+
+<ol type="a">
+<li>Base case: No intervention, though after identification of outbreak people become more cautious (reducing the transmission coefficient beta).</li>
+<li>Caution + quarantine/targeted vaccination</li>
+<li>Caution + local vaccination</li>
+<li>Caution +local vaccination + travel restrictions</li>
+<li>Caution + countrywide vaccination</li>
+<li>Caution + countrywide vaccination + travel restrictions</li>
+</ol>
+
+<p>
+The goals of the strategies are to (a) minimize overall fatalities, (b) minimize costs, (c) end the epidemic as soon as possible, and (d) minimize vaccination-related mortalities, the latter two mainly for political reasons. </p>
+
+ <h2 class="blog-post-title">Assumptions and Uncertainties</h2>
+ 
+
+ 
+ 
+ 
+
+<!-- 
+
+
+
+Code with detailed comments
+
+
+# At the start of every Python session, you import in the packages you need for that particular task
+
+import pandas as pd  		# This a popular package for handling databases 
+from pandas import DataFrame, pivot_table
+import numpy as np		# This is a popular package for manipulating numbers, math etc
+import copy, pickle		# These are for making copies and saving persistent objects,    
+                                                  respectively	
+
+
+############################   Main Epidemic Model   ############################
+
+# This is the main probabilistic epidemic model. It loads an object with population information and an object with a transportation matrix and outputs a dataframe (time series) modelling the epidemic. Disease parameters, initial infecteds, etc must be specified. 
+
+# Loading the population info and transportation databases, which I compiled in other scripts.
+
+pfile = open("epPopPickle.txt", 'r')
+pop = pickle.load(pfile)
+pfile.close()
+
+tmPfile = open("tmPickleP.txt", 'r')
+tmP = pickle.load(tmPfile)
+tmPfile.close()
+
+# Creating smaller version of the databases for testing purposes, only including cities with population of 5 million or more
+
+popTest = pop[pop['N'] > 5000000]
+tmPTest = pd.DataFrame(tmP, index = popTest.index, columns = popTest.index)
+
+# Rounding populations to zero decimal places
+
+N = np.round(popTest['N'],0)   
+Names = popTest['Name']
+
+# Haven't added vehicle data yet, so just doubling the air data for now
+
+l = tmPTest* 2                 
+
+######################## Specifying parameters #################################
+
+### All model parameters, assumptions, inputs, and uncertainties are specified in this section. The model is soft-coded to refer to the values set below. All interaction with the model happens in this section. In any variable followed by a list, values and probabilities can be added and subtracted at will, the model will update automatically. Disease and vaccine parameters are well researched and estimated. Cost assumptions are still relatively poor.
+
+### Disease parameters (assumptions and uncertainties) ###
+
+rR = [3.0, 5.0, 10.0]                       		 # Reproductive ratio
+rRp = [20.0/100.0, 70.0/100.0, 10.0/100.0]     # Probabilities
+lenInf = [5.0, 15.0]                     		 # Length of infectious period
+lenInfp = [80.0/100.0, 20.0/100.0]         	 # Probabilities
+lenLat = 14.0                               		 # Length of latent period
+				
+
+
+# These variables will be transformed later in the model into the parameters:
+# beta = reproductive ratio / length of infectious period, which describes 
+              movements from Susceptible(S) to Exposed(E); 
+# sigma = 1 / length of the latent period, which describes movements from E to 
+                 Infected(I);
+# gamma= 1 / length of infectious period, which describes movements from I to R
+       removed: either recovered or dead)
+
+mortalityRate = [.25, .35]                             # Mortality rate
+mortalityRatep = [50.0/100.0, 50.0/100.0]   # Probabilities
+
+qCost = 100.0          # Cost of quarantine/targetted vac per infected per day ($)
+
+vacCost = 20.0        # Cost of vaccination per individual ($)
+
+vMortRate = [6.0/1000000.0]    # Vaccine mortality rate
+vMortRatep = [100.0/100.0]     # Probabilities
+
+
+### Other assumptions and uncertainties ###
+
+IDlag = [7, 15] # Number of days after attack until identification
+
+# In a later model, ID should be contingent on the number of infecteds identified, not
+specified arbitrarily in days
+
+IDlagp = [50.0/100.0, 50.0/100.0, 20.0/100.0] # Probabilities
+
+dailyVacProp = [.10, .25]  		       # The max proportion of ppl vaccinated per day
+dailyVacPropp = [70.0/100.0, 30.0/100.0] # Probabilities
+
+cautionCoef = .1 # The amount by which people increase precautionary measures
+                           following ID of outbreak (staying indoors, reducing contact,
+                           washing hands, etc) regardless of gov't intervention
+
+IDrate = .5      # The proportion of infecteds identified
+
+quarantineEff = [.3, .5, .85] # The amount by which we reduce beta following
+                                           # quarantine/targeted vac
+
+quarantineEffp = [20.0/100.0, 50.0/100.0, 30.0/100.0] # Probabilities
+
+travRestrEff = .75     # The effectiveness of travel restrictions. Mixing will
+                                 be reduced by this proportion
+
+threshhold = 10    # When interventions are purely local, this is the 
+                             threshold number of infecteds past which a
+                             population implements the interventions
+
+### Other specifications ###
+
+expPop = 0                   # The location of attack, arbitrarily set in Palm Beach, FL
+
+expNum = 100.0           # The number of initial exposed people
+
+numTimePeriods = 720 # Number of days to model the epidemic
+
+### Some final plumbing
+
+tRange = np.arange(numTimePeriods)
+
+
+
+########################### Calculations ###################################
+
+# Our assumptions and uncertainties have been set, now we can run the main set of differential equations. We'll solve them in series for each strategy and each combination of uncertainties. As currently specified, there are six strategies and 3 (rR) X 2 (lenInf) X 2 (mort) X 2 (IDlag) X 2 (daily vac proportion) X 3 (quarantine efficiency) = 72 iterations for each strategy.
+
+# While the deterministic model records all outcomes for all time periods for all populations over the entire time period specified, the probabilistic model records only the end state of each iteration. The model will output six final dataframes with the outcomes + probabilities of that strategy.
+
+for st in range(6):             # This sets up the loop to model all six strategies
+    print(st)
+    tot = pd.DataFrame({}) # An empty dataframe to store endstates
+    
+    if st == 0:                      # Base case, no intervention
+        quarantine = 'N'
+        vac = 'N' 
+        localOnly = 'Y'
+        travRestr = 'N'
+    elif st == 1:                   # Quarantine/targeted vaccination only
+        quarantine = 'Y'
+        vac = 'N' 
+        localOnly = 'Y'
+        travRestr = 'N'
+    elif st == 2:                  # Quarantine/targeted vac + local herd vac
+        quarantine = 'Y'
+        vac = 'Y' 
+        localOnly = 'Y'
+        travRestr = 'N'
+    elif st == 3:                  # The above + travel restrictions
+        quarantine = 'Y'
+        vac = 'Y' 
+        localOnly = 'Y'
+        travRestr = 'Y'
+    elif st == 4:                 # Quarantine/targeted vac + countrywide herd vac
+        quarantine = 'Y'
+        vac = 'Y' 
+        localOnly = 'N'
+        travRestr = 'N'
+    elif st == 5:                 # The above + travel restrictions
+        quarantine = 'Y'
+        vac = 'Y' 
+        localOnly = 'N'
+        travRestr = 'Y'
+        
+    # Creating loops to go through each uncertain variable. As set, creates 72 iterations, each iteration takes approximately five minutes:
+    
+    for dvp in range(len(dailyVacProp)):  
+        for idl in range(len(IDlag)):  
+            for qe in range(len(quarantineEff)):
+                for vm in range(len(vMortRate)):
+                    for mr in range(len(mortalityRate)):
+                        for li in range(len(lenInf)):
+                            for r in range(len(rR)):
+                            
+                                # Setting parameters for each given iteration
+                                
+                                # The compartment designations SEIR usually
+                                refer to proportions. For absolute numbers
+                                the letters XZYW are used. V is the number
+                                vaccinated.
+
+                                n = len(N)
+                                Y = np.zeros(n)
+                                Z = np.zeros(n)
+                                Z[expPop] = expNum
+                                W = np.zeros(n)
+                                X = N - Y
+                                V = np.zeros(n)
+                                
+                                # The disease parameters discussed earlier
+
+                                beta = rR[r]/lenInf[li]
+                                gamma= 1/lenInf[li]
+                                sigma= 1/lenLat
+
+                     # Specifying the transportation matrix to be used: either the normal matrix
+ in the case of no travel restrictions, or the reduced matrix if 
+travel restrictions are to be imposed
+
+                                if travRestr == 'Y':
+                                    postIDTranspMatrix = l*(1-travRestrEff)
+                                elif travRestr == 'N':
+                                    postIDTranspMatrix = l
+                                    
+                                # Specifying the beta coefficient to be used: either the normal beta (reduced
+ by caution following ID) or the beta reduced by quarantine/targeted vac, as well.   
+
+                                if quarantine == 'Y':
+                                    postIDBeta = beta*(1-cautionCoef)*(1-quarantineEff[qe])
+                                elif quarantine == 'N':
+                                    postIDBeta = beta*(1-cautionCoef)
+                                    
+                                # Final plumbing
+
+                                df = DataFrame({'N':N, 'Y':Y, 'X':X, 'Z':Z, 'D':np.zeros(n), 'W':W, 'tp':np.zeros(n), 'qCost': np.zeros(n), 'V':np.zeros(n)}, index = Names)
+
+                                dfFinal = copy.deepcopy(df)
+                         
+                                # Beginning the main loop of differential 
+                                equations. Solving in series across the number
+                                of time periods specified
+
+                                for i in range(1,numTimePeriods): 
+                                    ndf = DataFrame({'N':N, 'Y':0.0, 'X':0.0, 'Z':0.0, 'W':0.0, 'D':0.0, 'V':0.0,'sum':0.0, 'qCost': np.zeros(n), 'tp':np.ones(n)*i},  index = Names)
+
+# Specifying whether to use pre or post ID transport matrix and beta coefficient
+
+                                    if i > IDlag[idl]:
+                                        beta = postIDBeta
+                                        l = postIDTranspMatrix
+                                    
+                                    
+                                    # Transmitting the virus within each population. This works simultaneously w two dataframes: 'previous' (the results from the previous time period) and 'new' (blank nitially). It fills in 'new' based on the values in 'previous', using the equations specified. It then appends the filled in 'new' to the master version. Finally, 'new' is designated as 'previous' for use in the next time period and a new, blank dataframe is created and specified 'new'. 
+                                    
+                                    for j in range(Names.min(), Names.max()+1):
+                                        if j in Names:
+
+			        # The differential equations used are just a standard compartmental SEIR model. 
+                                            
+                                            # Changes in S
+                                            ndf['X'][j] = df['X'][j] - beta*df['X'][j]*df['Y'][j]/df['N'][j] 
+
+                                            # Changes in E
+                                            ndf['Z'][j] = df['Z'][j] + beta*df['X'][j]*df['Y'][j]/df['N'][j] - sigma*df['Z'][j] 
+
+                                            # Changes in I
+                                            ndf['Y'][j] = df['Y'][j] + sigma*df['Z'][j] - gamma*df['Y'][j] 
+
+                                            # Changes in R
+                                            ndf['W'][j] = df['W'][j] + gamma*df['Y'][j] 
+
+                                            # Used for testing purposes to validate results
+                                            ndf['sum'][j] = ndf['X'][j] + ndf['Z'][j] + ndf['Y'][j] + ndf['W'][j] 
+
+                                            # Number dead
+                                            ndf['D'][j] = ndf['W'][j] * mortalityRate[mr]
+                                         
+                                      
+# Conducting immunizations, when appropriate. For each population, if 
+it’s past the ID date, and the strategy specifies vaccination in that population, and the number of IDed infecteds exceeds the threshold value (in the case of localized vac),  then immunization proceeds at the rate specified. People are removed from Susceptibles and put in Vaccinated.
+
+                                    for j in range(Names.min(), Names.max()+1):
+                                        if j in Names:
+                                            if (i > IDlag[idl] and vac == 'Y' and localOnly == 'N') or (i > IDlag[idl] 
+and vac == 'Y' and localOnly == 'Y' and  ndf['Y'][j]*IDrate > threshhold):
+                                                ndf['X'][j] -= ndf['X'][j]*dailyVacProp[dvp]
+                                                ndf['V'][j] = ndf['X'][j]*dailyVacProp[dvp]
+                                            else:
+                                                ndf['V'][j] = 0
+                                                
+                                            # Adding up quarantine costs
+
+                                            if i > IDlag[idl] and quarantine == 'Y' and ndf['Y'][j]*IDrate > 1.0:
+                                                ndf['qCost'][j] = ndf['Y'][j]*IDrate*qCost
+                                            else:
+                                                ndf['qCost'][j] = 0
+                              
+                                    
+                                    # Mixing between populations at the rates specified in the transport matrix. Movement is first subtracted from sending populations, then added to receiving populations. Infecteds don't travel, but Exposeds do.
+
+                                    for j in range(Names.min(), Names.max()+1):
+                                        if j in Names: 
+                                            for g in range(Names.min(), Names.max()+1):
+                                                if g in Names:
+                                                
+                                                    ndf['X'][j] -= l[g][j]*ndf['X'][j] 
+                                                    ndf['Z'][j] -= l[g][j]*ndf['Z'][j]
+                                                    #ndf['Y'][j] -= l[g][j]*ndf['Y'][j]
+                                                    ndf['W'][j] -= l[g][j]*ndf['W'][j]
+                                                    
+                                                    ndf['X'][j] += l[j][g]*ndf['X'][g] 
+                                                    ndf['Z'][j] += l[j][g]*ndf['Z'][g]
+                                                    #ndf['Y'][j] += l[j][g]*ndf['Y'][g]
+                                                    ndf['W'][j] += l[j][g]*ndf['W'][g]
+
+                                    dfFinal = dfFinal.append(ndf)
+                                    df = ndf
+
+		        # Done running the equations, now we’re packaging the output
+                                    
+                                # Finding epidemic endpoint. This is defined as the point at which deaths per day drops below one. I find the difference between the dead in the current and the previous periods. The first time that difference drops below 1, that time period is recorded as the endpoint of the epidemic. 
+                                    
+                                pt = pd.pivot_table(dfFinal, ['D'], 'tp')
+                  
+                                for i in range(1, len(pt)):
+                                    diff = pt['D'][i] - pt['D'][i-1]
+                                    if diff < 1.0 and i > 100 or i == len(pt)-1:
+                                        endpoint = i
+                                        break   
+                                               
+                                               
+                                # Compiling the outputs for packaging. To repeat: The probabilistic model only saves the outcomes of each iteration, not the entire iteration itself (as the deterministic model does).  
+
+                                tX = sum(lastEntry['X']) 		# Total remaining S
+                                tZ = sum(lastEntry['Z']) 		# Total remaining E
+                                tY = sum(lastEntry['Y']) 		# Total remaining I
+                                tW = sum(lastEntry['W']) 	# Total remaining R
+                                tV = sum(dfFinal['V'])   		# Total vaccinated
+                                tVcost = tV * vacCost 		# Total vaccination costs
+                                tVD = tV * vMortRate[vm] 	# Total killed by vacc
+                                tD = sum(lastEntry['D'])+tVD 	# Total dead overall
+                                tqCost = sum(dfFinal['qCost']) 	# Total quart. cost
+
+                                # The probability of the given iteration occurring
+
+                                p = rRp[r] * lenInfp[li] * mortalityRatep[mr] * vMortRatep[vm]*quarantineEffp[qe] * IDlagp[idl] * dailyVacPropp[dvp]
+
+                                # The name of the scenario as a string
+
+                                scenario = '(Probability.: '+str(p) +') '+'<br>'+'(Quarantine Eff.: '+str(quarantineEff[qe]) +') '+'<br>'+'(ID Lag: '+str(IDlag[idl]) +') '+'<br>' +'(Reproductive Ratio: '+str(rR[r]) +') '+'<br>'+'(Length Inf. Period: '+str(lenInf[li]) +') '+'<br>'+ '(Mortality Rate: '+str(mortalityRate[mr]) +') '+'<br>'+ '(Vac. Mort. Rate: '+str(vMortRate[vm]) +') '+'<br>' +  '(Max Daily Vac: '+str(dailyVacProp[dvp]) +') '
+                                
+                                # Printing out to follow progress of computations
+
+                                print(scenario) 
+                                
+                                # The final results of the given iteration
+
+                                totInd = {'rR': rR[r], 'lenInf': lenInf[li], 'mr': mortalityRate[mr], 'vmr': vMortRate[vm], 'quartEff': quarantineEff[qe], 'idLag': IDlag[idl], 'dailyvacprop': dailyVacProp[dvp], 'tX':tX, 'tZ': tZ, 'tY':tY, 'tW':tW, 'Prob':p, 'tD':tD, 'tV':tV, 'tqCost':tqCost, 'tvCost':tVcost, 'endpoint': endpoint, 'tVD':tVD, 'scenario':scenario}
+
+                                print(totInd) 
+                                
+                                # Appending results of individual iteration to  master copy. This dataframe will be returned as the output of this model. It will have as many rows as there are iterations and contains the columns specified in totInd directly above.
+
+                                tot=tot.append(totInd, ignore_index=True)
+    
+    # Verifying that key expected value results match those of deterministic model        
+
+    print('tD', sum(tot.Prob*tot.tD))
+    print('end', sum(tot.Prob*tot.endpoint))
+    print('tVcost', sum(tot.Prob*tot.tV)*vacCost)
+    print('tqCost', sum(tot.Prob*tot.tqCost))
+    
+    # Checking results for an individual population
+
+    print(dfFinal[dfFinal.index==31453])   
+    
+    # Verifying that probabilities sum to one
+
+    print(sum(tot['Prob']))
+   
+    # Saving output as a persistent object for use in graphing, analysis etc. A separate dataframe is stored for each strategy.   
+
+    outputFile = open(str("epProbOutput"+str(st)+".txt"), 'w')
+    pickle.dump(tot, outputFile)
+    outputFile.close()
+    
+    
+# Calculations complete! 
+
+# Other scripts have been written for graphing. They will be fully commented and included with the final model.
+
+-->
+
+
+
+
+
+
+
+
+
+
+
+   
 
 {% endblock %}
