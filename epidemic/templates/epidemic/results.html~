@@ -4,52 +4,132 @@
 
     <h2 class="blog-post-title">Full Results</h2>
     
-    <p>This is the Python code used to construct the model. You can follow along by refering to the comments highlighted in green </p>
-
-    <hr>
-    
-
-These are screenshots from the interactive graphs to be included in the final version of the model. In the interaction version, strategies can be toggled on and off, graph area can be zoomed and panned, and information about each given scenario pops up when hovering the mouse over it. 
-
-Due to the size of the model, a test set including only populations above 5 million were included. Select results from the deterministic model (set to the same expected values, though for the entire U.S. rather than the test set) are included to illustrate the spatial-temporal progression of the epidemic. A full discussion of the results will be postponed until the final model, though I’ll touch on the main points briefly below:
+    <p>This section includes and expands on the highlighted results discussed in the overview. Due to the size of the model, a test set of only metapopulations above three million people was used; absolute numbers, therefore, do not currently reflect countrywide totals. Each graph can be controlled by its menu located at the top right corner of the graph. Please allow this page a minute to load.</p>
 
 
+<h3 class="blog-post-title">Expected Values and Variation</h3>
+
+<p> Quarantine fails to prevent significant mortalities when quarantine effectiveness does not reach the 80% threshhold. Toggle off the first two strategies (orange and blue) to view the more effective strategies: Travel restrictions have only modest effects, while countrywide vaccination shows the lowest overall mortality and lowest variability in mortality. Note the relatively fat tails for both localized vaccination strategies. Travel restrictions on top of countrywide vaccination make no difference in the model so those results have been omitted from the discussion.</p>
+
+    <div>
+    <a href="https://plot.ly/~reddlee/622/" target="_blank" title="Deaths by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/622.png" alt="Deaths by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:622"  src="https://plot.ly/embed.js" async></script>
+</div>
+<div>
+    <a href="https://plot.ly/~reddlee/590/" target="_blank" title="Deaths by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/590.png" alt="Deaths by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:590"  src="https://plot.ly/embed.js" async></script>
+</div>
+<hr>
+Below is the expected values of the epidemic's progression. Toggle off the two ineffective strategies to view the effective interventions.
+  <div>
+    <a href="https://plot.ly/~reddlee/618/" target="_blank" title="Epidemic Progression by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/618.png" alt="Epidemic Progression by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:618"  src="https://plot.ly/embed.js" async></script>
+    </div>
+<hr>
 
 
-When quarantine efficiency fails to reach the 80% threshold, a strategy based solely on quarantine and targeted vaccination does not prevent significant mortalities. 
+
+<p> Ineffective quarantine only prolongs the epidemic. Localized vaccination limits intervention to the natural speed of the epidemic, while immediate countrywide vaccination consistantly brings the epidemic to an end quickly. Note the variation in the localized strategies. The scenarios butting up against the right side of the frame were still active when the simulation was stopped at 500 days. </p>
+<div>
+    <a href="https://plot.ly/~reddlee/626/" target="_blank" title="Epidemic Length by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/626.png" alt="Epidemic Length by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:626"  src="https://plot.ly/embed.js" async></script>
+</div>
+<div>
+    <a href="https://plot.ly/~reddlee/596/" target="_blank" title="Epidemic Length by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/596.png" alt="Epidemic Length by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:596"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+<hr>
 
 
 
 
-In the case of local vaccination, we notice a slight decrease in fatalities after the restriction of travel. The final two strategies show identical results, suggesting that travel restrictions do not save extra lives when countrywide vaccination has already been undertaken. These two results vary little from local vac + travel restrictions. Notice the fat tails for local vaccination strategies.
+
+<p>As expected, countrywide vaccination involves more vaccine-related deaths than do the localized strategies, though all strategies exhibit significant variation. </p>
+
+<div>
+    <a href="https://plot.ly/~reddlee/628/" target="_blank" title="Vaccination Deaths by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/628.png" alt="Vaccination Deaths by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:628"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+<div>
+    <a href="https://plot.ly/~reddlee/599/" target="_blank" title="Vaccination Deaths by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/599.png" alt="Vaccination Deaths by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:599"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+<hr>
 
 
-Quarantine shows the highest average cost as a result of the extended length of the epidemic. It also shows huge variation as a result of sensitivity to beta and the resulting variation in epidemic length.
+<p> Ineffective quarantine is very expensive, largely as a result of the extended length of the epidemic. Toggle off quarantine (orange) and base (blue) to view the other strategies: Note the significant variation in the localized vaccination strategies. Countrywide vaccination is consistently the most expensive of the remaining options. Cost estimates are extremely rough. Use with caution.</p>
+<div>
+    <a href="https://plot.ly/~reddlee/624/" target="_blank" title="Total Cost by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/624.png" alt="Total Cost by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:624"  src="https://plot.ly/embed.js" async></script>
+</div>
 
-Zooming in, we see that local vac plus travel restrictions shows the lowest cost. These results are not particularly useful, however, as the cost assumptions are relatively arbitrary at this point. The economic costs of restricting travel have not been included, for example, though they are indeed substantial. These results do suggest, however, that a prolonged ineffective response can bring about significant economic costs. 
-
-While countrywide herd vaccination andappeared the safest option in terms of overall mortalities, it seems to 
-ensure a relatively high rate of vaccination-related deaths.
-
-As mentioned previously, unless beta is reduced by at least 80%, quarantine alone will not prevent an epidemic.
-
-
-An interactive scatterplot shows the outcomes in three dimensions.
-
-
-Quarantine slows down the epidemic.
+<div>
+    <a href="https://plot.ly/~reddlee/593/" target="_blank" title="Total Cost by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/593.png" alt="Total Cost by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:593"  src="https://plot.ly/embed.js" async></script>
+</div>
+<hr>
 
 
-Local vaccination and travel restrictions have a significant impact on the geographic progression of the epidemic, though details are still unclear.
+
+<p>This scatterplot consolidates the findings outlined above for all outcomes except vaccine-related deaths. Hover over each individual dot to review the parameters that led to the particular set of outcomes. Note the huge variation in quarantine/targetted vac (orange). Toggle off the two least effective strategies (base--blue, and quarantine--orange) to zoom in on the remaining strategies. </p>
+<div>
+    <a href="https://plot.ly/~reddlee/568/" target="_blank" title="Outcomes by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/568.png" alt="Outcomes by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:568"  src="https://plot.ly/embed.js" async></script>
+</div>
+<hr>
+
+<h3 class="blog-post-title">Spatial-Temporal Results</h3>
+
+<p>More exploration is needed on this front, as the model is still generating results I don't fully understand. To refine this portion of the model, it would be necessary to enlist more computing power (i.e. use Amazon Web Services or something similar), as using the smaller test database doesn't produce an accurate description of the disease's spatial-temporal dynamics and one iteration using the full database takes over a day to run. The following results were generated by the deterministic version of the model using the full database, and should not be compared directly to the outcomes discussed above. </p>
+
+   
+   <p> The unimpeded epidemic races quickly across the country. </p> 
+    <div>
+    <a href="https://plot.ly/~reddlee/556/" target="_blank" title="Base (no interventions)" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/556.png" alt="Base (no interventions)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:556"  src="https://plot.ly/embed.js" async></script>
+    </div>
+
+<p> Ineffective quarantine/targetted vaccination only serves to prolong the epidemic.</p>
+<div>
+    <a href="https://plot.ly/~reddlee/559/" target="_blank" title="Quarantine-targetted vac only" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/559.png" alt="Quarantine-targetted vac only" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:559"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+<p> Local vaccination efforts are triggered once the number of IDed infecteds passes a certain threshhold. Rotate the graph and notice the double humps experienced by a few of the metapopulations. This might be caused by influxes of infecteds from neighboring metapopulations, though further exploration is necessary.
+<div>
+    <a href="https://plot.ly/~reddlee/562/" target="_blank" title="Quarantine-targetted vac. &lt;br&gt;+ localized vac" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/562.png" alt="Quarantine-targetted vac. &lt;br&gt;+ localized vac" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:562"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+<p>Travel restrictions eliminate most of the double-humps.</p>
+<div>
+    <a href="https://plot.ly/~reddlee/565/" target="_blank" title="Quarantine-targetted vac. &lt;br&gt;+ localized vac + travel restr." style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/565.png" alt="Quarantine-targetted vac. &lt;br&gt;+ localized vac + travel restr." style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:565"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+<p>Countrywide vaccinations end the epidemic quickly and thoroughly.</p>
+
+<div>
+    <a href="https://plot.ly/~reddlee/119/" target="_blank" title="Quarantine-targetted vac. &lt;br&gt;+ countrywide vac." style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/119.png" alt="Quarantine-targetted vac. &lt;br&gt;+ countrywide vac." style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:119"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+
+<hr>
+
+<h3 class="blog-post-title">Sensitivities</h3>
+<p> As expected, mortalities are strongly and positively affected by the mortality rate, the overall reproduction number, the time it takes to ID the outbreak, the length of the latency period, and the relative contagiousness of the prodromal period.</p>
  
-Countrywide vaccination stops the epidemic immediately.
+<p>Mortality, however, is also highly sensitive to quarantine effectiveness, which is strongly correlated with the length of the latency period and the relative contagiousness of the prodromal period (as per model construction). While latency length and prodomal virulence are well-researched and documented, the coefficients on these variables in affecting quarantine effectiveness are not. It is left to the modeller to input them. Choosing coefficients that reflect more effective quarantine result, unsurprisingly, in the model recommending a strategy based on quarantine. As shown below, quarantine efficiencies of 70% or above make quarantine/targetted vaccination the optimum strategy.</p> 
+
+<div>
+    <a href="https://plot.ly/~reddlee/630/" target="_blank" title="The Effect of Quarantine Efficiency on Total Deaths" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/630.png" alt="The Effect of Quarantine Efficiency on Total Deaths" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:630"  src="https://plot.ly/embed.js" async></script>
+</div>
 
 
-    
-    <!-- For code chunks. -->
-    <pre class="brush: python" name="code">
-from django.http import HttpResponse
-from django.shortcuts import render            
-    </pre>
 
 {% endblock %}

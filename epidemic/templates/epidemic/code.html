@@ -4,7 +4,7 @@
 
     <h2 class="blog-post-title">Code</h2>
     
-    <p>This is the Python code used to construct the model. You can follow along by refering to the comments highlighted in green </p>
+    <p>This is the Python code used to construct the model. You can follow along by refering to the comments highlighted in green. The scripts used to assemble the transportation data, construct the metapopulation layer of the model, create all the graphs, and build this website have not been included, though of course they're available if you're interested. </p>
 
     <hr>
     
@@ -17,9 +17,15 @@
 #################################################################################
 ############################ Main Epidemic Model ################################
 
-# This is the main epidemic model. It loads a pickle with population information and a pickle with a transportation matrix and outputs six dataframes with the final results of all iterations for each of six strategies. Disease parameters, initial infecteds, etc must be specified.
+# This is the main epidemic model. It loads a pickle with population information 
+# and a pickle with a transportation matrix and outputs six dataframes with the final
+# results of all iterations for each of six strategies. Disease parameters, initial
+# infecteds, etc must be specified.
 
-# Before running, (1) transport matrix must be current (transportMatrix.py), (2) population estimates must be current (epPopEstimator.py) and (3) proportional transport matrix (transportMatrixProp.py) must be current. If any changes are made upstream, above programs must first be run before main model can run.
+# Before running, (1) transport matrix must be current (transportMatrix.py), (2)
+# population estimates must be current (epPopEstimator.py) and (3) proportional 
+# transport matrix (transportMatrixProp.py) must be current. If any changes are made
+# upstream, above programs must first be run before main model can run.
 
 
 
@@ -43,20 +49,21 @@ tmPfile = open("tmPickleP.txt", 'r')
 tmP = pickle.load(tmPfile)
 tmPfile.close()
 
-# Creating smaller version of the databases for testing purposes, only including cities with population of 5 million or more
-popTest = pop[pop['N'] > 5000000]
+# Creating smaller version of the databases for testing purposes, only including cities
+# with population of 5 million or more
+popTest = pop[pop['N'] > 3000000]
 tmPTest = pd.DataFrame(tmP, index = popTest.index, columns = popTest.index)
 
 # Rounding populations to zero decimal places
 N = np.round(popTest['N'],0)   
 Names = popTest['Name']
     
-# The transportation matrix. Haven't added automobile data yet, so just multiplying air data by 2 for now. This provides a reasonable estimate of flows between large cities but underreports total transportation flows. The test set in use is comprised solely of large cities
-transMatrix = tmPTest* 2
-       
-numTimePeriods = 800  # Number of days to model the epidemic
-iterations = 40     # Number of iterations 
+# The transportation matrix. 
 
+transMatrix = tmPTest
+       
+numTimePeriods = 500  # Number of days to model the epidemic
+iterations = 40       # Number of iterations 
 expPop = list(popTest.Name).index(31703)  # Putting infection in NYC
 
 seed = np.random.randint(1, 1000000) 
@@ -65,10 +72,9 @@ seed = np.random.randint(1, 1000000)
 tRange = np.arange(numTimePeriods)
 
 
-
 ########################### Initializing model ###################################
 
-for st in range(6):        # This sets up the loop to model all six strategies
+for st in range(5):        # This sets up the loop to model all six strategies
     
     if st == 0:            # Base case, no intervention
         quarantine = 'N'
@@ -120,33 +126,48 @@ for st in range(6):        # This sets up the loop to model all six strategies
     
     
         ### Disease parameters (assumptions and uncertainties) ###
+        # Due to my limited experience as an epidemiologist and modeller, I've frequently chosen
+        # the triangular distribution as my workhorse "good enough" solution.
+        # All of the assumptions can be easily changed. Many of them probably should be.
+        # Generally, disease and vaccine parameters are well-researched while cost assumptions and
+        # behavioral assumptions are weak.
 
         lenLat = np.random.normal(12.0, 2.0)                     
-        # Length of latent/exposed period (exposed but not yet infectious). For each individual, this is gamma distributed
+        # Length of latent/exposed period (exposed but not yet infectious). For each
+        # individual, this is gamma distributed
         
         lenProdr = np.random.triangular(.5, 3.0, 5.0)
         # Length of prodromal period (mildly infectious)
         
         lenInf = np.random.normal(9.0, 2.0)                    
-        # Length of fully infectious period. For each individual, this is gamma distributed
+        # Length of fully infectious period. For each individual, this is gamma 
+        # distributed
         
         rR_tot = np.random.triangular(3.0, 4.0, 9.0)
         # Basic reproductive ratio
         
         prodrPercentTot = lenProdr/(lenProdr+lenInf)
-        # Percent of total infectious time spent in prodromal stage. Used in calculations below
+        # Percent of total infectious time spent in prodromal stage. Used in 
+        # calculations below
         
         rR_prodr = np.random.triangular(0.0, rR_tot*prodrPercentTot*.5, rR_tot*prodrPercentTot)
-        # Amount of reproductive number generated during prodromal period, ie number of secondary cases generated per primary case during the prodromal period. The max number implies that contagiousness in the prodromal phase equals that in the infectious phase. The min number implies no contagiousness during prodromal period
+        # Amount of reproductive number generated during prodromal period, ie number 
+        # of secondary cases generated per primary case during the prodromal period. 
+        # The max number implies that contagiousness in the prodromal phase equals that
+        # in the infectious phase. The min number implies no contagiousness during
+        # prodromal period
         
         rR_inf = rR_tot - rR_prodr  
-        # Amount of the reproductive number generated during the full infectious phase. Calculated as the remainder of total number after prodromal infections
+        # Amount of the reproductive number generated during the full infectious phase.
+        # Calculated as the remainder of total number after prodromal infections
         
         beta = rR_inf / lenInf 
-        # New infections per fully-infected person per day in completely susceptible population. This contributes to the flow from Susceptibles to Exposeds
+        # New infections per fully-infected person per day in completely susceptible
+        # population. This contributes to the flow from Susceptibles to Exposeds
         
         betaP = rR_prodr / lenProdr
-        # New infections per Prodromal per day in completely susceptible population. This contributes to the flow from Susceptibles to Exposeds
+        # New infections per Prodromal per day in completely susceptible population. 
+        # This contributes to the flow from Susceptibles to Exposeds
         
         sigma= 1.0/lenLat # Dictates the flow from Exposeds to Prodromals
         
@@ -162,21 +183,24 @@ for st in range(6):        # This sets up the loop to model all six strategies
         vMortRate = np.random.triangular(1.0/1000000.0, 3.0/1000000.0, 10.0/1000000.0)    
         # Vaccine mortality rate. Solid estimates based on research.
         
-        dailyVacProp = np.random.triangular(.03, .07, .2) 
-        # The max proportion of ppl vaccinated per day. Solid estimates based on research.
+        dailyVacProp = np.random.triangular(.03, .05, .1) 
+        # The max proportion of ppl vaccinated per day.
         
         vacLag = np.random.triangular(3.0, 5.0, 14.0)
         # The number of days following ID of outbreak vaccination begins. 
         
         vacFail = np.random.triangular(1.0/1000000.0, 3.0/1000000.0, 100.0/1000000.0)
-        # The proportion of failed vaccinations. Can be the result of ineffective vaccine or misuse. TODO: this isn't yet hooked up to the model
+        # The proportion of failed vaccinations. Can be the result of ineffective vaccine
+        # or misuse. TODO: this isn't yet hooked up to the model
         
         
         ### Cost assumptions ###
         
-        qCost = 100.0         # Cost of quarantine/targetted vac per infected per day ($). Very rough estimate
+        qCost = 100.0         # Cost of quarantine/targetted vac per infected per 
+        # day ($). Very rough estimate
 
-        vacCost = 20.0        # Cost of vaccination per individual ($). Very rough estimate
+        vacCost = 20.0        # Cost of vaccination per individual ($). Very rough 
+        # estimate
 
 
         ### Other assumptions and uncertainties ###
@@ -185,24 +209,40 @@ for st in range(6):        # This sets up the loop to model all six strategies
         # Number of days after attack until identification
 
         cautionCoef = np.random.triangular(.05, .25, .5)
-        # The amount by which people increase precautionary measures following ID of outbreak (staying indoors, reducing contact, washing hands, etc) regardless of gov't intervention
+        # The amount by which people increase precautionary measures following ID of
+        # outbreak (staying indoors, reducing contact, washing hands, etc) regardless 
+        # of gov't intervention
 
         IDrate = np.random.triangular(.5, .8, .95)       
-        # The proportion of infecteds identified
+        # The proportion of infecteds identified. This needs to be refined to reflect
+        # when they are IDed
         
-        quarantineEffID = np.random.triangular(.5, .8, .95) 
-        # The effectiveness of quarantine for IDed infecteds. An individual infected's contagiousness will be reduced by this percentage following quarantine, ie they will generate this percentage fewer secondary cases
+        quarantineEffID = np.random.triangular(.05, .1, .2) + np.random.normal(.05, .01)*lenLat + np.random.normal(.05, .015)*(1-betaP/beta)*lenProdr
+        if quarantineEffID > 1.0:
+            quarantineEffID = 1.0
+        # The effectiveness of quarantine for IDed infecteds. An individual infected's
+        # contagiousness will be reduced by this percentage following quarantine, ie they
+        # will generate this percentage fewer secondary cases. It is a direct function of
+        # the length of the latency period and the relative contagiousness of the
+        # prodromal period. It is calibrated so that with the longest reasonable latent
+        # period and a prodromal period with no infectiousness (ie continuation of latent
+        # period), quarantine effectiveness of IDed infecteds is 1.0
         
         quarantineEff = quarantineEffID * IDrate
         # Overall efficacy of quarantine
 
-        # Note: This simple compartment model cannot predict quarantine efficiency itself, it takes quarantine efficacy as an input. In this case, beta reductions of above 80% begin to kill the epidemic, anything below 80% just prolongs it
+        # Note: This simple compartment model cannot predict quarantine efficiency 
+        # itself, it takes quarantine efficacy as an input. In this case, beta 
+        # reductions of above 80% begin to kill the epidemic, anything below 80% just
+        # prolongs it
 
-        travRestrEff = np.random.triangular(.6, .8, .95)    
-        # The effectiveness of travel restrictions. Mixing between geographic populations will be reduced by this proportion
+        travRestrEff = np.random.triangular(.7, .85, .99)    
+        # The effectiveness of travel restrictions. Mixing between geographic 
+        # populations will be reduced by this proportion
 
-        threshhold = np.random.triangular(1.0, 10.0, 30.0)    
-        # When interventions are purely local, this is the threshhold number of identified infecteds past which a population implements the interventions
+        threshhold = np.random.triangular(1.0, 15.0, 50.0)    
+        # When interventions are purely local, thi is the threshhold number of 
+        # identified infecteds past which a population implements the interventions
 
         expNum = np.random.triangular(10.0, 100.0, 3000.0) 
         # The number of initial exposed people, or index cases
@@ -228,7 +268,7 @@ for st in range(6):        # This sets up the loop to model all six strategies
         # Beginning the main loop of differential equations
         for i in range(1,numTimePeriods): 
         
-            # Adding variation to the day's transportation matrix
+            # Adding variation to the day's transportation matrix.
             l = transMatrix * np.random.normal(1.0, .15, transMatrix.shape)
      
             # Preparing to implement travel restrictions if appropriate
@@ -237,7 +277,8 @@ for st in range(6):        # This sets up the loop to model all six strategies
             elif travRestr == 'N':
                 postIDTranspMatrix = l
                 
-            # Preparing to implement caution and quarantine/targetted vaccination if appropriate
+            # Preparing to implement caution and quarantine/targetted vaccination
+            # if appropriate
             if quarantine == 'Y':
                 postIDBeta = beta*(1-cautionCoef)*(1-quarantineEff)
                 postIDBetaP = betaP*(1-cautionCoef)*(1-quarantineEff)
@@ -256,7 +297,13 @@ for st in range(6):        # This sets up the loop to model all six strategies
                 betaPA = betaP
             
             
-            # Transmitting the virus within each population. This works simultaneously w two dataframes: 'Previous' (the results from the previous time period) and 'New' (blank initially). It fills in 'New' based on the values in 'Previous', using the equations specified. It then appends the filled in 'New' to the master version. Finally, 'New' is designated as 'Previous' for use in the next time period and a new, blank dataframe is created and specified 'New'.            
+            # Transmitting the virus within each population. This works simultaneously
+            # w two dataframes: 'Previous' (the results from the previous time period)
+            # and 'New' (blank initially). It fills in 'New' based on the values in
+            # 'Previous', using the equations specified. It then appends the filled in
+            # 'New' to the master version. Finally, 'New' is designated as 'Previous'
+            # for use in the next time period and a new, blank dataframe is created
+            # and specified 'New'.            
             for j in range(Names.min(), Names.max()+1):
                 if j in Names:
                     
@@ -282,7 +329,9 @@ for st in range(6):        # This sets up the loop to model all six strategies
                     ndf['D'][j] = ndf['W'][j] * mortalityRate
                     
               
-            # Conducting immunizations, when appropriate
+            # Conducting immunizations, when appropriate. A percentage of Susceptibles 
+            # will be removed from the pool of hosts each day after a certain lag 
+            # following ID of outbreak.
             for j in range(Names.min(), Names.max()+1):
                 if j in Names:
                     if (i > IDlag + vacLag and vac == 'Y' and localOnly == 'N') or (i > IDlag + vacLag and vac == 'Y' and localOnly == 'Y' and  ndf['Y'][j]*IDrate > threshhold):
@@ -298,7 +347,9 @@ for st in range(6):        # This sets up the loop to model all six strategies
                         ndf['qCost'][j] = 0
       
             
-            # Mixing between populations. Movement is first subtracted from sending populations, then added to receiving populations. Infecteds and Prodromals don't travel, but Exposeds do.
+            # Mixing between populations. Movement is first subtracted from sending
+            # populations, then added to receiving populations. Infecteds and Prodromals
+            # don't travel, but Exposeds do.
             for j in range(Names.min(), Names.max()+1):
                 if j in Names: 
                     for g in range(Names.min(), Names.max()+1):
@@ -317,7 +368,8 @@ for st in range(6):        # This sets up the loop to model all six strategies
             dfFinal = dfFinal.append(ndf)
             df = ndf
             
-        # Finding epidemic endpoint. This is defined as the point at which national deaths per day drops below one
+        # Finding epidemic endpoint. This is defined as the point at which national
+        # deaths per day drops below one
             
         pt = pd.pivot_table(dfFinal, ['D'], 'tp', aggfunc=np.sum)
 
@@ -326,23 +378,30 @@ for st in range(6):        # This sets up the loop to model all six strategies
             if diff < 1.0 and i > 40.0 or i == len(pt)-1:
                 endpoint = i
                 break   
-                # Note: "i > 40.0" above is used as a brute force method to prevent the program from reporting the epidemic endpoint as day number one (when deaths per day are also less than one)
+                # Note: "i > 40.0" above is used as a brute force method to prevent
+                # the program from reporting the epidemic endpoint as day number one
+                # (when deaths per day are also less than one)
             
             
-        ######################## Compiling results #####################################    
+        ######################## Compiling results ###################################    
         
         # The last entry in the panel contains the final results for each metapopulation
         lastEntry = dfFinal[dfFinal['tp'] == tRange[-2]]
         
-        # Creating a unique index for each metapopulation-time period combination. This will be used to create a pivot table reporting the average of all individual iterations of the epidemic. For use in reporting expected values. 
+        # Creating a unique index for each metapopulation-time period combination. 
+        #This will be used to create a pivot table reporting the average of all 
+        #individual iterations of the epidemic. For use in reporting expected values. 
         dfFinal['pvtIndex'] = dfFinal.Name + dfFinal.tp / 1000.0
         
+        print(len(dfFinal))
+        print(dfFinal)
+        
         # Printing out values to verify results. Used during testing
-        print(st)
-        print(mc)
+        #print(st)
+        #print(mc)
         #print(pt)
-        print(endpoint)    
-        print(dfFinal[dfFinal.index==31703])
+        #print(endpoint)    
+        #print(dfFinal[dfFinal.index==31703])
         #print(dfFinal[dfFinal.index==30977].tail())
         
         tX = sum(lastEntry['X']) # Total remaining S
@@ -362,20 +421,25 @@ for st in range(6):        # This sets up the loop to model all six strategies
         # The final results of the given iteration
         totInd = {'rR_tot': rR_tot, 'rR_prodr': rR_prodr,'beta':beta, 'lenInf': lenInf, 'lenProdr': lenProdr, 'betaP':betaP, 'lenLat': lenLat, 'mr': mortalityRate, 'vmr': vMortRate, 'cautionCoef': cautionCoef, 'quartEff': quarantineEff, 'idLag': IDlag, 'IDrate': IDrate, 'indexCases':expNum, 'travRestEff': travRestrEff, 'dailyvacprop': dailyVacProp, 'tX':tX, 'tZ': tZ, 'tY':tY, 'tW':tW, 'tD':tD, 'tV':tV, 'tqCost':tqCost, 'tvCost':tVcost, 'endpoint': endpoint, 'vacLag': vacLag, 'tVD':tVD, 'scenario':scenario}
   
-        # Appending results of individual iteration to master copy. This dataframe will be returned as the output of the model. It will have as many rows as there are iterations and contains the columns specified in totInd directly above.
+        # Appending results of individual iteration to master copy. This dataframe 
+        # will be returned as the output of the model. It will have as many rows as
+        # there are iterations and contains the columns specified in totInd directly
+        # above.
         tot=tot.append(totInd, ignore_index=True)
         TOT = TOT.append(dfFinal, ignore_index=True)
-        
-        #TODO: make pivot table averaging results: pt = pd.pivot_table(dfFinal, ['D'], 'tp', aggfunc=np.sum)
         
         # Ending the stopwatch and reporting timing. For testing purposes
         endTime = time.time()
         timeDuration = (endTime - startTime) / 60.0
         print("this iteration took "+str(timeDuration)+" minutes.")
-        print("the whole model will take "+str(timeDuration*iterations*6/60.0)+" hours")
+        print("the whole model will take "+str(timeDuration*iterations*5/60.0)+" hours")
 
 
-    # Saving output as a persistent object for use in graphing, analysis etc. Two separate dataframes are stored for each strategy, one with all information, and another with only the final results of each iteration
+    # Saving output as a persistent object for use in graphing, analysis etc. Two
+    # separate dataframes are stored for each strategy, one with all information,
+    # and another with only the final results of each iteration
+    
+        
     outputFile = open(str("epMCOutputFULL"+str(st)+".txt"), 'w')
     pickle.dump(TOT, outputFile)
     outputFile.close()    
@@ -383,6 +447,8 @@ for st in range(6):        # This sets up the loop to model all six strategies
     outputFile = open(str("epMCOutput"+str(st)+".txt"), 'w')
     pickle.dump(tot, outputFile)
     outputFile.close()
+        
+
     
     
 ############################## Calculations complete! ###################################

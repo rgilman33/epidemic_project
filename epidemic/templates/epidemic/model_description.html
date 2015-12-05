@@ -4,24 +4,23 @@
 
  <h2 class="blog-post-title">Description</h2>
     
-    <p>LETS START W THIS BADAASS 3d scatterplot. Toggle it around a little bit, it feels good.</p>
-   
-    <p>Look how many people die with no intervention!!</p>
-    <hr>
 
-<p>This model attempts to (1) give a detailed spatial-temporal description of a smallpox outbreak following an aerosol attack in a crowded area of a large U.S. city, and (2) show the effects of various interventions. It seeks to answer the question: How should the U.S. government best deploy resources to limit mortalities after a smallpox outbreak?</p>
+<p>This model attempts to (1) give a detailed spatial-temporal description of a smallpox outbreak following an aerosol attack in a crowded area of a large U.S. city, and (2) show the effects of various interventions. It seeks to answer the question: How should the U.S. government best respond after a smallpox outbreak?</p>
 	
-<p>The descriptive model on which the decision model is based combines a metapopulation compartment model describing state transitions within each population, and a transportation network describing movement between populations. 	
+<p>The descriptive model on which the decision model is based combines a metapopulation compartment model describing state transitions within each population, and a transportation network describing movement between populations. A more refined model would include metapopulations further segmented by demography, this model does not.</p> 	
 		
-<p>The SEIR compartment model describes the flow of people from susceptible, to exposed but not infectious, to infectious, to removed (either 		recovered or dead). State transitions are governed by smallpox’s 		well-documented disease parameters. The SEIR model creates a set of 		differential equations which are solved in series. 				
-<p>The transportation network is composed of two parts: A map of airport markets dividing the U.S. into approximately 300 metapopulations centered around one or more airports (designed with SEDAC data by assigning each population cell to the nearest airport market), and a 300x300 transportation matrix describing directional passenger 	flow between the populations (designed by parsing a U.S. DoT database). 	
+<p>The SIR compartment model describes the flow of people from susceptible, to exposed but not infectious, to mildly infectious (prodromal), to full infectious, to removed (either 		recovered or dead). Subdividing the infectious stage is crucial when modelling epidemics, as recommendations are extremely sensitive to the respective lengths and levels of contagiousness of the various stages (which aren't actually "stages" at all, as they flow smoothly from one to the other). State transitions are governed by smallpox’s 		well-documented disease parameters. The SIR model creates a set of 		differential equations which are solved in series. 	</p>		
 	
-<p>There are three types of intervention included in the model: 
+<p>The transportation network is composed of two parts: A map of airport markets dividing the U.S. into approximately 200 metapopulations centered around one or more airports (designed with SEDAC data by assigning each population cell to the nearest airport market), and a 200x200 transportation matrix describing directional passenger 	flow between the populations (designed by parsing a U.S. DoT database). Exposed but not contagious individuals travel but prodromals and full-infecteds do not.</p>
+	
+<p>There are three types of intervention included in the model:</p>
 
 <ul>
-<li>Quarantine of identified infecteds combined with targeted vaccination of only those in the immediate circle of the infected individual, including health workers. This is an attempt to attain herd immunity within the community surrounding an infected. In this model, and other models of this type, the intervention is crudely represented as a reduction in the transmission coefficient beta. As a result of the sensitivity of epidemic outcomes to beta, previous studies have come to vastly different conclusions regarding the effectiveness of quarantine alone in preventing an epidemic of smallpox. This is a key limitation of the compartmental epidemic model: The most this type of model can do is gauge the sensitivity of outcomes to quarantine efficiency, not predict quarantine efficiency itself.</li>
+<li><p>Quarantine of identified infecteds combined with targeted vaccination of only those in the immediate circle of the infected individual, including health workers. This is an attempt to attain herd immunity within the community surrounding an infected. In this model, and other models of this type, the intervention is crudely represented as a reduction in the transmission coefficient beta. As a result of the sensitivity of epidemic outcomes to beta, previous studies have come to vastly different conclusions regarding the effectiveness of quarantine alone in preventing an epidemic of smallpox. This is a key limitation of the compartmental epidemic model: The most this type of model can do is gauge the sensitivity of outcomes to quarantine efficiency, not predict quarantine efficiency itself. In this model, quarantine effectiveness is a function of the length of the latency period, the relative contagiousness of the prodromal period, and random noise.</p>
 
-<li>Vaccination, which can be either local (limited to populations with a given number of identified infecteds) or countrywide (administered to all people in all populations regardless of whether or not any infecteds have been identified in their midst). This intervention is represented in the model by removing individuals from the susceptibles population and placing them in the vaccinated category. </li>
+</li>
+
+<li>Vaccination, which can be either local (limited to populations with a given number of identified infecteds) or countrywide (administered to all people in all populations regardless of whether or not any infecteds have been identified in their midst). This intervention is represented in the model by removing individuals from the susceptibles population and placing them in the vaccinated category. In this model, vaccination begins after a short lag following ID of the outbreak. It proceeds at a given rate, vaccinating a proportion of the remaining susceptibles each day in the populations in which it was implemented. The model should be refined to consider different levels of vaccination (ie herd, etc).</p></li>
 
 <li>Travel restrictions. This intervention is modelled by reducing mixing between populations by a specified rate. </li>
 </ul>
@@ -40,12 +39,10 @@
 <p>
 The goals of the strategies are to (a) minimize overall fatalities, (b) minimize costs, (c) end the epidemic as soon as possible, and (d) minimize vaccination-related mortalities, the latter two mainly for political reasons. </p>
 
- <h2 class="blog-post-title">Assumptions and Uncertainties</h2>
- 
 
- 
- 
- 
+<p>
+For a detailed discussion of the assumptions made by the model and the model construction itself, please see <a href="/epidemic/code">Commented Source Code</a>, which should be read as an extension of the model description. </p>
+
 
 <!-- 
 

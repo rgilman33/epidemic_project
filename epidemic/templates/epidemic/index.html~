@@ -4,19 +4,27 @@
 
     <h1 class="blog-post-title">Overview</h1>
     
-    <p> To respond effectively to disease outbreak situations, policymakers need to be able to anticipate the geographic and temporal movements of potential epidemics, as well as predict the effects of various intervention strategies. This model attempts to address both of these needs. </P>
+    <p> To respond effectively to disease outbreak situations, policymakers need to be able to anticipate the geographic and temporal movements of potential epidemics, as well as predict the effects of various intervention strategies. This model attempts to address both of these needs. Please allow a moment for the page to load. </P>
     
     <hr>
    
     <h2 class="blog-post-title">The Descriptive Model</h2>
     <img src="http://www.gleamviz.org/wp-content/uploads/2012/05/model_three_layers.jpg" alt="pic" />
-    <p> To accurately portray the spread of the epidemic across time and space, the model combines three layers: A representation of the U.S. broken up into 200 “metapopulations”, each centered around a major airport; an epidemiological compartment model describing the disease behavior within each metapopulation; and a transportation network describing flows between metapopulations. </P>
+    <p> To accurately portray the spread of the epidemic across time and space, the model combines three layers: A representation of the U.S. broken up into 200 “metapopulations”, each centered around a major airport; an epidemiological compartment model describing the disease behavior within each metapopulation; and a transportation network describing flows between metapopulations. </p>
+    
+<p> As a result of the detailed transport matrix and the well-documented nature of smallpox's disease parameters, the descriptive portion of the model is relatively strong. When 40 smallpox index cases are placed in Palm Beach, FL, for example, the base case (no intervention) unfolds as follows:
+
+ <div>
+    <a href="https://plot.ly/~reddlee/556/" target="_blank" title="Base (no interventions)" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/556.png" alt="Base (no interventions)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:556"  src="https://plot.ly/embed.js" async></script>
+    </div>
+
     
     <hr>
     <h2 class="blog-post-title">The Decision Model</h2>
-    <p>The descriptive model was used to answer the specific question: How should the U.S. government respond to a major smallpox attack in New York City? There were four main objectives: (1) Minimize mortality, (2) End the epidemic ASAP, (3) Minimize cost, (4) Minimize vaccine-related deaths.</p>
+    <p>The descriptive model was used to answer the specific question: How should the U.S. government respond to a major smallpox attack in a large U.S. city? There were four main objectives: <ul> <li>Minimize mortality </li> <li>End the epidemic ASAP</li> <li>Minimize cost</li> <li>Minimize vaccine-related deaths</l></ul></p>
 
-<p/>Various combinations of the following four interventions were tested against the above objectives: (1) Quarantine + targetted/ring vaccination, (2) Full vaccination only in metapopulations with identified infecteds, (3) Full vaccination across the country, (4) Travel restrictions.</p>
+<p>Various combinations of the following four interventions were tested against the above objectives: <ul><li>Quarantine + targetted/ring vaccination</li><li>Full vaccination only in metapopulations with identified infecteds</li><li>Full vaccination across the country</li><li> Travel restrictions</li></ul></p>
 
 <hr>
 
@@ -27,58 +35,18 @@
     
 <li>Countrywide vaccination brings the quickest end to the epidemic, shows the lowest overall mortality and variation in mortality, but involves the highest number of vaccine-related deaths.</li>    
 
-<li>Longer latency periods and relatively low prodromal infectiousness favor quarantine while inverse conditions favor vaccination.</li>
+<li>Longer latency periods and relatively low prodromal infectiousness favor quarantine/targetted vaccination while inverse conditions favor full vaccination.</li>
 
-<li>
-Travel restrictions have very little impact on mortality, but do alter the spacial dynamics of the epidemic, concentrating deaths in relatively few areas. This may aid quarantine efforts (though this wasn’t modelled).</li>
 </ul>
 
-    <div>
-        <a href="https://plot.ly/~reddlee/587/" target="_blank" title="Outcomes by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/587.png" alt="Outcomes by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-        <script data-plotly="reddlee:587"  src="https://plot.ly/embed.js" async></script>
-    </div>
-    
-    
-    <div>
-    <a href="https://plot.ly/~reddlee/618/" target="_blank" title="Epidemic Progression by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/618.png" alt="Epidemic Progression by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="reddlee:618"  src="https://plot.ly/embed.js" async></script>
-    </div>
-    <hr>
-    <h2 class="blog-post-title">Highlighted Spatial-Temporal Results</h2>
-<p>
-Travel restrictions have very little impact on mortality, but do alter the spacial dynamics of the epidemic, concentrating deaths in relatively few areas. This may aid quarantine efforts (though this wasn’t modelled).</p>
-    
-    <div>
-    <a href="https://plot.ly/~reddlee/556/" target="_blank" title="Base (no interventions)" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/556.png" alt="Base (no interventions)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="reddlee:556"  src="https://plot.ly/embed.js" async></script>
-    </div>
 
-<div>
-    <a href="https://plot.ly/~reddlee/559/" target="_blank" title="Quarantine-targetted vac only" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/559.png" alt="Quarantine-targetted vac only" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="reddlee:559"  src="https://plot.ly/embed.js" async></script>
+    
+   <div>
+    <a href="https://plot.ly/~reddlee/568/" target="_blank" title="Outcomes by Strategy" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/568.png" alt="Outcomes by Strategy" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="reddlee:568"  src="https://plot.ly/embed.js" async></script>
 </div>
 
-
-<div>
-    <a href="https://plot.ly/~reddlee/562/" target="_blank" title="Quarantine-targetted vac. &lt;br&gt;+ localized vac" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/562.png" alt="Quarantine-targetted vac. &lt;br&gt;+ localized vac" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="reddlee:562"  src="https://plot.ly/embed.js" async></script>
-</div>
-
-<div>
-    <a href="https://plot.ly/~reddlee/565/" target="_blank" title="Quarantine-targetted vac. &lt;br&gt;+ localized vac + travel restr." style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/565.png" alt="Quarantine-targetted vac. &lt;br&gt;+ localized vac + travel restr." style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="reddlee:565"  src="https://plot.ly/embed.js" async></script>
-</div>
-
-    <hr>
-    
-    <h2 class="blog-post-title">A Major Weakness</h4>
-<p>This model suffers from a number of weaknesses, the most important being that quarantine efficiency is assumed, not modelled.</p>  
-<div>
-    <a href="https://plot.ly/~reddlee/630/" target="_blank" title="The Effect of Quarantine Efficiency on Total Deaths" style="display: block; text-align: center;"><img src="https://plot.ly/~reddlee/630.png" alt="The Effect of Quarantine Efficiency on Total Deaths" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="reddlee:630"  src="https://plot.ly/embed.js" async></script>
-</div>
-
-
+   
 
 
 {% endblock %}
